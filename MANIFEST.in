@@ -1,0 +1,2 @@
+recursive-include src/taiwan_address_normalizer/data *.csv
+

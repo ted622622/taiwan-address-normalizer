@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "taiwan-address-normalizer"
+version = "0.1.0"
+description = "Zero-dependency Taiwan address normalization for logistics, CRM, and data import workflows."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Shunluwang contributors" },
+]
+keywords = ["taiwan", "address", "normalization", "logistics", "geocoding", "traditional-chinese"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Natural Language :: Chinese (Traditional)",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Text Processing",
+]
+
+[project.urls]
+Homepage = "https://github.com/ted622622/taiwan-address-normalizer"
+Issues = "https://github.com/ted622622/taiwan-address-normalizer/issues"
+
+[project.scripts]
+tw-address = "taiwan_address_normalizer.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+taiwan_address_normalizer = ["data/*.csv"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"

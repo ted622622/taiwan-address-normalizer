@@ -1,0 +1,39 @@
+name: Address normalization bug
+description: Report a minimal, privacy-safe input/output mismatch.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Do not upload customer spreadsheets, names, phones, notes, coordinates, or order IDs.
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options: [safe, aggressive]
+    validations:
+      required: true
+  - type: input
+    id: input
+    attributes:
+      label: Minimal address input
+      placeholder: 台北市大安區...
+    validations:
+      required: true
+  - type: input
+    id: actual
+    attributes:
+      label: Actual output
+    validations:
+      required: true
+  - type: input
+    id: expected
+    attributes:
+      label: Expected output
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Why is the expected output correct?
+
