@@ -49,22 +49,43 @@ def _normalize_command(args: argparse.Namespace) -> int:
 def _batch_command(args: argparse.Namespace) -> int:
     with args.input.open("r", encoding="utf-8-sig", newline="") as source:
         reader = csv.DictReader(source)
-        if not reader.fieldnames or args.column not in reader.fieldnames:
+        if not reader.fieldnames:
+            raise SystemExit("CSV has no header row.")
+        duplicates = sorted({name for name in reader.fieldnames if reader.fieldnames.count(name) > 1})
+        if duplicates:
+            names = ", ".join(duplicates)
+            raise SystemExit(f"Duplicate CSV columns are not allowed: {names}")
+        if args.column not in reader.fieldnames:
             available = ", ".join(reader.fieldnames or []) or "(none)"
             raise SystemExit(f"Column {args.column!r} not found. Available columns: {available}")
         rows = list(reader)
+        for row_number, row in enumerate(rows, start=2):
+            if None in row:
+                raise SystemExit(f"Row {row_number} has more columns than the header.")
+        reserved = {"normalized_address", "address_warnings"}
+        conflicts = reserved.intersection(reader.fieldnames)
+        if conflicts:
+            names = ", ".join(sorted(conflicts))
+            raise SystemExit(f"Output column already exists: {names}")
         fieldnames = [*reader.fieldnames, "normalized_address", "address_warnings"]
+
+    processed_rows: list[dict[str, object]] = []
+    for row in rows:
+        result = normalize_with_report(row.get(args.column, ""), mode=args.mode)
+        processed: dict[str, object] = {
+            **row,
+            "normalized_address": result.normalized,
+            "address_warnings": "|".join(result.warnings),
+        }
+        if not args.allow_formulas:
+            processed = {key: _excel_safe_cell(value) for key, value in processed.items()}
+        processed_rows.append(processed)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", encoding="utf-8-sig", newline="") as target:
         writer = csv.DictWriter(target, fieldnames=fieldnames)
         writer.writeheader()
-        for row in rows:
-            result = normalize_with_report(row.get(args.column, ""), mode=args.mode)
-            row["normalized_address"] = result.normalized
-            row["address_warnings"] = "|".join(result.warnings)
-            if not args.allow_formulas:
-                row = {key: _excel_safe_cell(value) for key, value in row.items()}
+        for row in processed_rows:
             writer.writerow(row)
     print(f"Normalized {len(rows)} rows -> {args.output}")
     return 0

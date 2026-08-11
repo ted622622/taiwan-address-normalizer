@@ -71,6 +71,27 @@ def test_safe_mode_preserves_basement_marker() -> None:
 
 
 @pytest.mark.parametrize(
+    "source",
+    [
+        "新北市五股區100巷5弄3號",
+        "高雄市苓雅區500巷12弄8號",
+        "台北市大安區106巷5弄3號",
+    ],
+)
+def test_safe_mode_preserves_district_adjacent_lane_numbers(source: str) -> None:
+    assert normalize(source) == source
+
+
+def test_embedded_postal_code_before_named_road_is_removed() -> None:
+    assert normalize("新北市三重區241忠孝路2號") == "新北市三重區忠孝路2號"
+
+
+def test_long_digit_run_without_floor_marker_is_preserved() -> None:
+    source = f"台北市大安區忠孝東路{('1' * 2000)}號"
+    assert normalize(source) == source
+
+
+@pytest.mark.parametrize(
     ("source", "expected"),
     [
         ("台北市大安區忠孝東路四段一百號", "台北市大安區忠孝東路4段100號"),

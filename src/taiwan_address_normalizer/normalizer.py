@@ -527,7 +527,7 @@ def _strip_embedded_postal_codes(text: str) -> str:
         text,
     )
     return re.sub(
-        r"([\u4e00-\u9fff]{1,6}[\u5340\u9109\u93ae\u5e02])\d{3}(?=[\u4e00-\u9fff0-9]{1,12}(?:\u5927\u9053|\u8def|\u8857|\u5df7|\u5f04))",
+        r"([\u4e00-\u9fff]{1,6}[\u5340\u9109\u93ae\u5e02])\d{3}(?=[\u4e00-\u9fff]{1,12}(?:\u5927\u9053|\u8def|\u8857))",
         r"\1",
         text,
     )
@@ -547,8 +547,8 @@ def _restore_omitted_district_marker(text: str) -> str:
 
 
 def _normalize_floor(text: str) -> str:
-    text = re.sub(r"(\d+)[-~](\d+)樓", r"\1-\2F", text)
-    return re.sub(r"(\d+)樓", r"\1F", text)
+    text = re.sub(r"(?<!\d)(\d+)[-~](\d+)樓", r"\1-\2F", text)
+    return re.sub(r"(?<!\d)(\d+)樓", r"\1F", text)
 
 
 def _strip_village_between_district_and_road(text: str) -> str:
